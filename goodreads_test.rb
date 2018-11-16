@@ -30,10 +30,13 @@ class GoodreadsTest < Test::Unit::TestCase
   end
 
   def search_for_title(title)
-    # define search bar field element
     search_bar=@driver.find_element(:xpath,'/html/body/div[3]/div/header/div[2]/div/div[3]/form/input')
-    # input partial book title
     search_bar.send_keys(title, :return)
+  end
+
+  def select_book_title
+    book_title_link=@driver.find_element(css: 'a.bookTitle')
+    book_title_link.click
   end
 
   def test_login
@@ -59,7 +62,6 @@ class GoodreadsTest < Test::Unit::TestCase
     wait = Selenium::WebDriver::Wait.new(:timeout => 10) # seconds
     search_results = wait.until { @driver.find_element(css: 'h3.searchSubNavContainer') }
 
-    # check if search results header is displayed
     are_search_results_displayed=search_results.displayed?
 
     assert_equal(true, are_search_results_displayed,'search results display')
@@ -70,9 +72,7 @@ class GoodreadsTest < Test::Unit::TestCase
   def test_select_book_title
     login_user
     search_for_title('harry potter')
-
-    hp_title_link=@driver.find_element(css: 'a.bookTitle')
-    hp_title_link.click
+    select_book_title
 
     # wait until check mark displays on button, timeout in 10 seconds
     wait = Selenium::WebDriver::Wait.new(:timeout => 10) # seconds
