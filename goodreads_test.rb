@@ -9,7 +9,7 @@ class GoodreadsTest < Test::Unit::TestCase
     # :ie     -> iexplore
 
     # navigate to the test site
-    @driver.navigate.to "https://www.goodreads.com"
+    @driver.navigate.to 'https://www.goodreads.com'
   end
 
   def login_user
@@ -33,6 +33,17 @@ class GoodreadsTest < Test::Unit::TestCase
     element = wait.until { @driver.find_element(css: 'h3') }
   end
 
+  def search_for_title(title)
+    # define search bar field element
+    search_bar=@driver.find_element(:xpath,'/html/body/div[3]/div/header/div[2]/div/div[3]/form/input')
+    # input partial book title
+    search_bar.send_keys(title, :return)
+
+    # wait until search results display, timeout in 10 seconds
+    wait = Selenium::WebDriver::Wait.new(:timeout => 10) # seconds
+    search_results = wait.until { @driver.find_element(css: 'h3.searchSubNavContainer') }
+  end
+
   def test_login
     login_user
 
@@ -44,20 +55,12 @@ class GoodreadsTest < Test::Unit::TestCase
 
     assert_equal(true, is_currently_reading_displayed,'currently reading display')
 
-    assert_equal("currently reading".upcase, currently_reading.text, 'currently reading text')
+    assert_equal('currently reading'.upcase, currently_reading.text, 'currently reading text')
   end
 
   def test_search
     login_user
-
-    # define search bar field element
-    search_bar=@driver.find_element(:xpath,'/html/body/div[3]/div/header/div[2]/div/div[3]/form/input')
-    # input partial book title
-    search_bar.send_keys('harry potter', :return)
-
-    # wait until search results display, timeout in 10 seconds
-    wait = Selenium::WebDriver::Wait.new(:timeout => 10) # seconds
-    search_results = wait.until { @driver.find_element(css: 'h3.searchSubNavContainer') }
+    search_for_title('harry potter')
 
     # define search result header "PAGE 1 OF ABOUT"
     search_results=@driver.find_element(css: 'h3.searchSubNavContainer')
@@ -67,7 +70,7 @@ class GoodreadsTest < Test::Unit::TestCase
 
     assert_equal(true, are_search_results_displayed,'search results display')
 
-    assert_equal(true, search_results.text.include?("PAGE 1 OF ABOUT"), 'search results text')
+    assert_equal(true, search_results.text.include?('PAGE 1 OF ABOUT'), 'search results text')
   end
 
   def teardown
