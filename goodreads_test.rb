@@ -42,8 +42,6 @@ class GoodreadsTest < Test::Unit::TestCase
     # check if currently reading header is displayed
     is_currently_reading_displayed=currently_reading.displayed?
 
-    puts is_currently_reading_displayed
-
     assert_equal(true, is_currently_reading_displayed,'currently reading display')
 
     assert_equal("currently reading".upcase, currently_reading.text, 'currently reading text')
@@ -57,26 +55,19 @@ class GoodreadsTest < Test::Unit::TestCase
     # input partial book title
     search_bar.send_keys('harry potter', :return)
 
-  #   # #define submit button element
-  #   # search_bar_button=@driver.find_element(:css,'searchBox__icon--magnifyingGlass.gr-iconButton searchBox__icon.searchBox__icon--navbar')
-  #   # #click on submit button
-  #   # search_bar_button.click
+    # wait until search results display, timeout in 10 seconds
+    wait = Selenium::WebDriver::Wait.new(:timeout => 10) # seconds
+    search_results = wait.until { @driver.find_element(css: 'h3.searchSubNavContainer') }
 
-  #   # wait until 'Currently Reading' displays, timeout in 10 seconds
-  #   # wait = Selenium::WebDriver::Wait.new(:timeout => 10) # seconds
-  #   # element = wait.until { @driver.find_element(css: 'h3') }
+    # define search result header "PAGE 1 OF ABOUT"
+    search_results=@driver.find_element(css: 'h3.searchSubNavContainer')
 
-  #   # # define currently reading header
-  #   # currently_reading=@driver.find_element(css: 'h3')
+    # check if search results header is displayed
+    are_search_results_displayed=search_results.displayed?
 
-  #   # # check if currently reading header is displayed
-  #   # is_currently_reading_displayed=currently_reading.displayed?
+    assert_equal(true, are_search_results_displayed,'search results display')
 
-  #   # puts is_currently_reading_displayed
-
-  #   # assert_equal(true, is_currently_reading_displayed,'currently reading display')
-
-  #   # assert_equal("currently reading".upcase, currently_reading.text, 'currently reading text')
+    assert_equal(true, search_results.text.include?("PAGE 1 OF ABOUT"), 'search results text')
   end
 
   def teardown
