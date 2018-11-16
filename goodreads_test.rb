@@ -27,10 +27,6 @@ class GoodreadsTest < Test::Unit::TestCase
     loginSubmitButton=@driver.find_element(:css,'.gr-button.gr-button--dark')
     #click on submit button
     loginSubmitButton.click
-
-    # wait until 'Currently Reading' displays, timeout in 10 seconds
-    wait = Selenium::WebDriver::Wait.new(:timeout => 10) # seconds
-    element = wait.until { @driver.find_element(css: 'h3') }
   end
 
   def search_for_title(title)
@@ -38,17 +34,14 @@ class GoodreadsTest < Test::Unit::TestCase
     search_bar=@driver.find_element(:xpath,'/html/body/div[3]/div/header/div[2]/div/div[3]/form/input')
     # input partial book title
     search_bar.send_keys(title, :return)
-
-    # wait until search results display, timeout in 10 seconds
-    wait = Selenium::WebDriver::Wait.new(:timeout => 10) # seconds
-    search_results = wait.until { @driver.find_element(css: 'h3.searchSubNavContainer') }
   end
 
   def test_login
     login_user
 
-    # define currently reading header
-    currently_reading=@driver.find_element(css: 'h3')
+    # wait until 'Currently Reading' displays, timeout in 10 seconds
+    wait = Selenium::WebDriver::Wait.new(:timeout => 10) # seconds
+    currently_reading = wait.until { @driver.find_element(css: 'h3') }
 
     # check if currently reading header is displayed
     is_currently_reading_displayed=currently_reading.displayed?
@@ -62,8 +55,9 @@ class GoodreadsTest < Test::Unit::TestCase
     login_user
     search_for_title('harry potter')
 
-    # define search result header "PAGE 1 OF ABOUT"
-    search_results=@driver.find_element(css: 'h3.searchSubNavContainer')
+    # wait until search results header "PAGE 1 OF ABOUT", timeout in 10 seconds
+    wait = Selenium::WebDriver::Wait.new(:timeout => 10) # seconds
+    search_results = wait.until { @driver.find_element(css: 'h3.searchSubNavContainer') }
 
     # check if search results header is displayed
     are_search_results_displayed=search_results.displayed?
@@ -71,6 +65,25 @@ class GoodreadsTest < Test::Unit::TestCase
     assert_equal(true, are_search_results_displayed,'search results display')
 
     assert_equal(true, search_results.text.include?('PAGE 1 OF ABOUT'), 'search results text')
+  end
+
+  def test_select_book_title
+    login_user
+    search_for_title('harry potter')
+
+    hp_title_link=@driver.find_element(css: 'a.bookTitle')
+    hp_title_link.click
+
+    # wait until check mark displays on button, timeout in 10 seconds
+    wait = Selenium::WebDriver::Wait.new(:timeout => 10) # seconds
+    book_title_header = wait.until { @driver.find_element(css: 'h1#bookTitle') }
+
+    # check if book title header is displayed
+    book_title_header_displayed=book_title_header.displayed?
+
+    assert_equal(true, book_title_header_displayed,'book title header display')
+
+    assert_equal('Harry Potter and the Sorcerer\'s Stone', book_title_header.text, 'book title header text')
   end
 
   def teardown
