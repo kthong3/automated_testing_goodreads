@@ -74,7 +74,7 @@ class GoodreadsTest < Test::Unit::TestCase
     search_for_title('harry potter')
     select_book_title
 
-    # wait until check mark displays on button, timeout in 10 seconds
+    # wait until book title displays, timeout in 10 seconds
     wait = Selenium::WebDriver::Wait.new(:timeout => 10) # seconds
     book_title_header = wait.until { @driver.find_element(css: 'h1#bookTitle') }
 
@@ -84,6 +84,28 @@ class GoodreadsTest < Test::Unit::TestCase
     assert_equal(true, book_title_header_displayed,'book title header display')
 
     assert_equal('Harry Potter and the Sorcerer\'s Stone', book_title_header.text, 'book title header text')
+  end
+
+  def test_add_selected_book_title
+    login_user
+    search_for_title('harry potter')
+    select_book_title
+
+    # wait until book title displays before looking for want to read button, timeout in 10 seconds
+    wait = Selenium::WebDriver::Wait.new(:timeout => 10) # seconds
+    book_title_header = wait.until { @driver.find_element(css: 'h1#bookTitle') }
+
+    want_to_read_button=@driver.find_element(css: 'button.wtrToRead')
+    want_to_read_button.click
+
+    # wait until check mark displays on button, timeout in 10 seconds
+    wait = Selenium::WebDriver::Wait.new(:timeout => 10) # seconds
+    check_marked_wtr_button = wait.until { @driver.find_element(css: 'button.wtrStatusToRead.wtrUnshelve') }
+
+    # check if checked marked want to read is displayed
+    check_marked_button_displayed=check_marked_wtr_button.displayed?
+
+    assert_equal(true, check_marked_button_displayed,'check mark on want to read button display')
   end
 
   def teardown
